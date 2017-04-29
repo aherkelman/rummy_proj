@@ -83,13 +83,17 @@ use std::fmt::Debug;
 	        }
 
 	        // Draw top card, if this is the last card reset stuff
-	        pub fn draw_card(&mut self) -> Card<T>
+	        pub fn draw_card(&mut self) -> Option<Card<T>>
 	        {
 	        	// If the deck is empty reset
-	        	if self.current_deck.len()==0
+	        	if self.current_deck.is_empty()
 	        	{
 	        		println!("Deck is empty");
+	        		
 	        		self.reset();
+	        		if self.current_deck.is_empty(){
+	        			return None
+	        		}
 	        	}
 	        	//println!("drawing cards");
 	        	// Ask ken how to handle this situation if neither deck has cards
@@ -103,7 +107,7 @@ use std::fmt::Debug;
 	        	    self.current_deck.pop();
 	        	    //println!("draw card 2");
 	        	    // Return next card
-	        	    next_card
+	        	    Some(next_card)
 	            // }
 	            // else
 	            // {

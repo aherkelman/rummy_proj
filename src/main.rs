@@ -1,49 +1,89 @@
-#![allow(dead_code)]
-#![allow(non_snake_case)]
-extern crate rand;
-use std::io;
+extern crate piston;
+extern crate graphics;
+extern crate glutin_window;
+extern crate opengl_graphics;
 
+use piston::window::WindowSettings;
+use piston::event_loop::*;
+use piston::input::*;
+use glutin_window::GlutinWindow as Window;
+use opengl_graphics::{ GlGraphics, OpenGL };
 
-
-// Card Stuct needs the following:
-//     Members:
-//     Card Type - Specific Information related to a card, passed in on creation
-//         doing this allows for different kinds of cards
-/*
-mod cards{
-	use rand;
-	use rand::Rng;
-	use std::fmt::Debug;
-	use PlayingCard;
-    use Suit;
-    use std::io;
+pub struct App {
+    gl: GlGraphics, // OpenGL drawing backend.
+    rotation: f64   // Rotation for the square.
 }
-*/
 
-mod gencard;
-mod rummy;
-// Player Information
+impl App {
+    fn render(&mut self, args: &RenderArgs) {
+        use graphics::*;
 
+        const GREEN: [f32; 4] = [0.0, 1.0, 0.0, 1.0];
+        const RED:   [f32; 4] = [1.0, 0.0, 0.0, 1.0];
 
+        let square = rectangle::square(0.0, 0.0, 50.0);
+        let rotation = self.rotation;
+        let (x, y) = ((args.width / 2) as f64,
+                      (args.height / 2) as f64);
 
+        self.gl.draw(args.viewport(), |c, gl| {
+            // Clear the screen.
+            clear(GREEN, gl);
 
+            let transform = c.transform.trans(x, y)
+                                       .rot_rad(rotation)
+                                       .trans(-25.0, -25.0);
 
-// Game Card Type
-//    Preditor, Prey, Repro, or Enviorn
-//    Can do like this example where some of the values have a cooresponding integer value
-//    // An `enum` may either be `unit-like`,
-//     Engineer,
-//     Scientist,
-//     // like tuple structs,
-//     Height(i32),
-//     Weight(i32),  
+            // Draw a box rotating around the middle of the screen.
+            rectangle(RED, square, transform, gl);
+        });
+    }
 
+    fn update(&mut self, args: &UpdateArgs) {
+        // Rotate 2 radians per second.
+        self.rotation += 2.0 * args.dt;
+    }
+}
 
+fn main() {
+    // Change this to OpenGL::V2_1 if not working.
+    let opengl = OpenGL::V3_2;
 
+    // Create an Glutin window.
+    let mut window: Window = WindowSettings::new(
+            "spinning-square",
+            [200, 200]
+        )
+        .opengl(opengl)
+        .exit_on_esc(true)
+        .build()
+        .unwrap();
 
+    // Create a new game and run it.
+    let mut app = App {
+        gl: GlGraphics::new(opengl),
+        rotation: 0.0
+    };
 
+    let mut events = Events::new(EventSettings::new());
+    while let Some(e) = events.next(&mut window) {
+        if let Some(button) = e.release_args() {
+            match button {
+                Button::Keyboard(key) => println!("Released keyboard key '{:?}'", key),
+                Button::Mouse(button) => println!("Released mouse button '{:?}'", button),
+                Button::Controller(button) => println!("Released controller button '{:?}'", button),
+            }
+        };
+        e.mouse_cursor(|x, y| {
+            //cursor = [x, y];
+            println!("Mouse moved '{} {}'", x, y);
+        });
+        if let Some(r) = e.render_args() {
+            app.render(&r);
+        }
 
-fn main() 
-{
-	rummy::game::play_game();
+        if let Some(u) = e.update_args() {
+            app.update(&u);
+        }
+    }
 }

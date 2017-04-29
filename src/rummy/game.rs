@@ -40,15 +40,24 @@ pub fn play_game(){
 
     for x in 0..7
     {
-    	player1Hand.card_to_hand(deck.draw_card());
-    	player2Hand.card_to_hand(deck.draw_card());
+    	match(deck.draw_card()){
+    		Some(x)=>{
+    			//println!("picked up a {:?}",x);
+    			player1Hand.card_to_hand(x);
+    			player2Hand.card_to_hand(deck.draw_card().unwrap());
+    		},
+    		None=>{
+    			panic!("deck empty");
+    		}
+    	}
+    	
     }
 
     let mut player1:Player<AiP> = Player::new(player1Hand);
     let mut player2:Player<UserP> = Player::new(player2Hand);
 
     let mut j = 0;
-    let draw = deck.draw_card();
+    let draw = deck.draw_card().unwrap();
     deck.discard(draw);
 
     let mut num_turns = 0;
