@@ -1,0 +1,7 @@
+[package]
+name = "rummy_proj"
+version = "0.1.0"
+authors = ["aherk"]
+
+[dependencies]
+rand = "0.3.15"
