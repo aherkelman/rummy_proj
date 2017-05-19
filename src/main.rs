@@ -4,8 +4,9 @@ extern crate sprite;
 extern crate find_folder;
 
 extern crate graphics;
+extern crate rand;
 
-
+extern crate gfx_device_gl;
 
 use graphics::types::SourceRectangle;
 use std::rc::Rc;
@@ -21,7 +22,21 @@ use ai_behavior::{
     While,
 };
 
+mod draw;
+mod gencard;
+mod rummy;
+
 fn main() {
+    /*
+    let mut game = rummy::game::Game::new();
+    let xpos = 1.2;
+    let ypos = 2.5;
+    while true{
+    game.play_game(xpos,ypos);
+    }
+    */
+    //rummy::game::play_game();
+
     let (width, height) = (1000, 600);
     let opengl = OpenGL::V3_2;
     let mut window: PistonWindow =
@@ -30,6 +45,8 @@ fn main() {
         .opengl(opengl)
         .build()
         .unwrap();
+
+    let mut draw_stuff=draw::Drawing::new(&mut window);
 
     let assets = find_folder::Search::ParentsThenKids(3, 3)
         .for_folder("Images").unwrap();
@@ -93,6 +110,7 @@ fn main() {
             clear([1.0, 1.0, 1.0, 1.0], g);
             image(&rust_logo, c.transform, g);
             scene.draw(c.transform, g);
+            draw_stuff.draw(&c,g);
             sprite2.draw(c.transform,g);
         });
         if let Some(_) = e.press_args() {

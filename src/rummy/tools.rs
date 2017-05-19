@@ -1,4 +1,7 @@
 	  use gencard::Card;
+      use sprite::Sprite;
+      use piston_window::Texture;
+      use gfx_device_gl;
 
 // Standard Playing Card Type
 //   Hearts, Spades, Diamonds, or Clubs
@@ -9,6 +12,8 @@ pub enum Suit {
     Diamond,
     Club,
 }
+
+
 #[derive(Clone,Copy,Debug)]
 pub struct PlayingCard{
     pub val:usize,    // numerical value of card
@@ -16,7 +21,7 @@ pub struct PlayingCard{
     pub numMatchs:usize, // number of matches of same val
 }
 
-
+#[derive(Clone,Debug)]
 pub struct Hand{
     pub current_hand:Vec<Card<PlayingCard>>
 }

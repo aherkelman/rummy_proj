@@ -4,13 +4,14 @@ use std::fmt::Debug;
 	use rand::Rng;
 	
 
-	#[derive(Debug,Clone,Copy)]
-	pub struct Card<T:Copy>
+
+	#[derive(Clone,Copy,Debug)]
+	pub struct Card<T:Clone+Copy+Debug>
 	{
 		details:T
 	}
 
-	impl<T:Copy> Card<T>
+	impl<T:Clone+Copy+Debug> Card<T>
 	{
 	    // Function to create a new card based on passed on details passed in
 	    pub fn new(detail:T)->Card<T>
@@ -42,14 +43,15 @@ use std::fmt::Debug;
 	//     New Game - Intialize all the values and get ready for game (shuffle so on) (create struct function)
 	//     Discard Card - Helper funtion to discard a card, nothing complicated
 
-	    #[derive(Debug,Clone)]
-	    pub struct Deck<T:Copy+Debug>
+
+#[derive(Clone,Debug)]
+	    pub struct Deck<T:Clone+Copy+Debug>
 	    {
 	        pub current_deck:Vec<Card<T>>, // vector of cards in deck
 	        pub discard_deck:Vec<Card<T>> // vector of cards in discard
 	    }
 
-	    impl<T:Copy + Debug> Deck<T>
+	    impl<T:Clone+Copy+Debug> Deck<T>
 	    {
 	    
 	        // Function to make new deck by passing in an array of card discriptions
@@ -60,6 +62,7 @@ use std::fmt::Debug;
 	            for i in arr.iter(){
 	                init_vec.push(Card::new(*i));
 	            }
+
 	            // Inatialize the fields of current deck to all cards and discard to none
 	            Deck{current_deck:init_vec, discard_deck:Vec::new()}
 	        }
