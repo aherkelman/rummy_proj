@@ -5,13 +5,13 @@ use std::fmt::Debug;
 	
 
 
-	#[derive(Clone,Copy,Debug)]
-	pub struct Card<T:Clone+Copy+Debug>
+	#[derive(Debug)]
+	pub struct Card<T:Debug>
 	{
 		details:T
 	}
 
-	impl<T:Clone+Copy+Debug> Card<T>
+	impl<T:Debug> Card<T>
 	{
 	    // Function to create a new card based on passed on details passed in
 	    pub fn new(detail:T)->Card<T>
@@ -44,27 +44,30 @@ use std::fmt::Debug;
 	//     Discard Card - Helper funtion to discard a card, nothing complicated
 
 
-#[derive(Clone,Debug)]
-	    pub struct Deck<T:Clone+Copy+Debug>
+#[derive(Debug)]
+	    pub struct Deck<T:Debug>
 	    {
 	        pub current_deck:Vec<Card<T>>, // vector of cards in deck
 	        pub discard_deck:Vec<Card<T>> // vector of cards in discard
 	    }
 
-	    impl<T:Clone+Copy+Debug> Deck<T>
+	    impl<T:Debug> Deck<T>
 	    {
 	    
 	        // Function to make new deck by passing in an array of card discriptions
-	        pub fn new(arr:Vec<T>)->Deck<T>{
+	        pub fn new(arr:Vec<Card<T>>)->Deck<T>{
 	            // Create new vectory to copy cards into
-	            let mut init_vec:Vec<Card<T>>=Vec::new();
+	            //let mut init_vec:Vec<Card<T>>=Vec::new();
 	            // For each element of passed in array add a card 
+
+	            //let init_vec:Vec<Card<T>>=arr.iter().map(|a|Card::new(*a)).collect();
+	            /*
 	            for i in arr.iter(){
 	                init_vec.push(Card::new(*i));
-	            }
+	            }*/
 
 	            // Inatialize the fields of current deck to all cards and discard to none
-	            Deck{current_deck:init_vec, discard_deck:Vec::new()}
+	            Deck{current_deck:arr, discard_deck:Vec::new()}
 	        }
             
             // Randomly shuffle all cards in current deck
@@ -76,12 +79,17 @@ use std::fmt::Debug;
 	        	{
 	        		// Find a random other card
 	        		let num=rand::thread_rng().gen_range(0, self.current_deck.len());
+                 	
+
+	        		self.current_deck.swap(i,num);
+	        		/*
                  	// Store current card in temp
                  	let temp:Card<T>=self.current_deck[i];
                  	// Set current card to random card
                  	self.current_deck[i] = self.current_deck[num];
                  	// Set random card to current card stored in temp
                  	self.current_deck[num] = temp;   
+	        		*/
 	        	}
 	        }
 
@@ -105,12 +113,13 @@ use std::fmt::Debug;
 	        	// {
 	        		//println!("draw card 1");
 	        	    // Set next card to last card in deck (backwards order to avoid shifting)
-	        	    let next_card:Card<T> = self.current_deck[self.current_deck.len()-1];
+	        	    //let next_card:Card<T> = self.current_deck[self.current_deck.len()-1];
 	        	    // Remove drawn card from deck
-	        	    self.current_deck.pop();
+	        	    self.current_deck.pop()
+
 	        	    //println!("draw card 2");
 	        	    // Return next card
-	        	    Some(next_card)
+	        	    //Some(next_card)
 	            // }
 	            // else
 	            // {

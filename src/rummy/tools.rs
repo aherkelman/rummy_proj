@@ -2,7 +2,8 @@
       use sprite::Sprite;
       use piston_window::Texture;
       use gfx_device_gl;
-
+      use rummy::draw;
+      use std;
 // Standard Playing Card Type
 //   Hearts, Spades, Diamonds, or Clubs
 #[derive(Clone,Copy,Debug,PartialEq)]
@@ -14,14 +15,15 @@ pub enum Suit {
 }
 
 
-#[derive(Clone,Copy,Debug)]
+#[derive(Debug)]
 pub struct PlayingCard{
     pub val:usize,    // numerical value of card
-    pub suit:Suit,   // suit of card
+    pub suit:usize,   // suit of card
     pub numMatchs:usize, // number of matches of same val
+    pub sprite:draw::Cardsprite
 }
 
-#[derive(Clone,Debug)]
+#[derive(Debug)]
 pub struct Hand{
     pub current_hand:Vec<Card<PlayingCard>>
 }
@@ -183,6 +185,17 @@ impl Hand{
             pub fn value_sort(hand: &mut Vec<Card<PlayingCard>>)
             {
 
+                let mut func=|a:&Card<PlayingCard>,b:&Card<PlayingCard>|{
+                    if a.get_specific().val>b.get_specific().val{
+                        std::cmp::Ordering::Greater
+                    }else{
+                        std::cmp::Ordering::Less
+                    }
+                    
+                };
+
+                hand.sort_by(func);
+                /*
             	for i in 1..hand.len()
 	        	{
                     let mut j = i - 1;
@@ -209,44 +222,38 @@ impl Hand{
                     	num = 0;
                     }
                     hand[num] = reff;
-
-	            }
+	            }*/
 
             }
 
             // sort that sorts an already sorted array by value
             pub fn suit_sort(hand: &mut Vec<Card<PlayingCard>>)
             {
-            	let mut temp_hand:Vec<Card<PlayingCard>>=Vec::new();
-            	for i in 0..hand.len()
-            	{
-            		if hand[i].get_specific().suit == Suit::Heart
-            		{
-            			temp_hand.push(hand[i]);
-            		}
-            	}
-            	for i in 0..hand.len()
-            	{
-            		if hand[i].get_specific().suit == Suit::Club
-            		{
-            			temp_hand.push(hand[i]);
-            		}
-            	}
-            	for i in 0..hand.len()
-            	{
-            		if hand[i].get_specific().suit == Suit::Spade
-            		{
-            			temp_hand.push(hand[i]);
-            		}
-            	}
-            	for i in 0..hand.len()
-            	{
-            		if hand[i].get_specific().suit == Suit::Diamond
-            		{
-            			temp_hand.push(hand[i]);
-            		}
-            	}
-            	hand.clone_from(&temp_hand);
 
+                let mut func=|a:&Card<PlayingCard>,b:&Card<PlayingCard>|{
+                    if a.get_specific().suit>b.get_specific().suit{
+                        std::cmp::Ordering::Greater
+                    }else{
+                        std::cmp::Ordering::Less
+                    }
+                    
+                };
+
+                hand.sort_by(func);
+
+                //unimplemented!();
+                /*
+            	let mut temp_hand:Vec<Card<PlayingCard>>=Vec::new();
+                for z in 0..4{
+                	for i in 0..hand.len()
+                	{
+                		if hand[i].get_specific().suit == z
+                		{
+                			temp_hand.push(hand[i]);
+                		}
+                	}
+                }
+            	hand.clone_from(&temp_hand);
+                */
             }
 	    }

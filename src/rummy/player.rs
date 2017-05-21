@@ -1,4 +1,5 @@
 use gencard::Card;
+use gencard::Deck;
 use rummy::tools::PlayingCard;
 use rummy::tools::RummyUtils;
 use std::io;
@@ -17,22 +18,25 @@ impl AiP{
         AiP{hand:hand}
     }
     // Call function to live out current turn      
-    pub fn play_turn(&mut self, topCard: &Card<PlayingCard>, deckCard: &Card<PlayingCard>, turnNum: &usize)-> (Card<PlayingCard>, bool, bool)
+    pub fn play_turn(&mut self, deck:&mut Deck<PlayingCard>, turnNum: &usize)-> (Card<PlayingCard>, bool)
     {
-         println!("Top discard: {:?}", topCard);
-         println!("Top Draw: {:?}",deckCard);
+        let val={
+            let topCard=deck.discard_deck.last().unwrap();
+            let deckCard=deck.current_deck.last().unwrap();
 
-        // If top card of discard is in something then take it, otherwise draw a card.
-        let mut drew_card = false;
-         if RummyUtils::in_something(&self.hand.current_hand, topCard)
-         {
-            self.hand.card_to_hand(*topCard);
-         }
-         else 
-         {
-            self.hand.card_to_hand(*deckCard);
-            drew_card = true;
-         }
+            println!("Top discard: {:?}", topCard);
+            println!("Top Draw: {:?}",deckCard);
+
+            // If top card of discard is in something then take it, otherwise draw a card.
+            RummyUtils::in_something(&self.hand.current_hand, topCard) 
+        };
+
+        if val{
+            self.hand.card_to_hand(deck.discard_deck.pop().unwrap());
+        }else{
+            self.hand.card_to_hand(deck.current_deck.pop().unwrap());
+        }
+
 
          // Mark how many matches each card has
          RummyUtils::mark_safe(&mut self.hand.current_hand);
@@ -83,11 +87,11 @@ impl AiP{
             k +=1;
         }
         // Save card to return 
-        let discarded_card = self.hand.current_hand[max_index];
+        //self.hand.current_hand[max_index];
 
         // remove card from vectors
         ratings.remove(max_index);
-        self.hand.card_from_hand(max_index);
+        let discarded_card = self.hand.card_from_hand(max_index);
 
         // if sum of ratings is 0 the player has rummy
         // start of sum function
@@ -108,7 +112,7 @@ impl AiP{
          println!("");
          println!("disacarded card: {:?}",discarded_card);
          // return results
-         (discarded_card,drew_card, rummy)
+         (discarded_card, rummy)
 
 
     }
@@ -122,40 +126,44 @@ impl UserP{
     pub fn new(hand:Hand)->UserP{
         UserP{hand:hand}
     }
-    pub fn drawing_card(&mut self, topCard: &Card<PlayingCard>, deckCard: &Card<PlayingCard>)-> usize
+    pub fn drawing_card(&mut self, deck:&mut Deck<PlayingCard>)
     {
-         RummyUtils::value_sort(&mut self.hand.current_hand);
-         println!("Top discard: {:?}", topCard);
-         println!("Top Draw: {:?}",deckCard);
-         println!("Current Hand: ");
-         for i in self.hand.current_hand.iter()
-         {
-            println!("{:?}",i);
-         }
-         println!("Enter 1 to take top discard, and 2 to draw card.");
-        let mut n = String::new();
-        io::stdin()
-           .read_line(&mut n)
-           .expect("failed to read input.");
-        let input = n.trim().parse::<usize>().expect("invalid input");
-        let mut drew_card = 0;
+        let input={
+             let topCard=deck.discard_deck.last().unwrap();
+             let deckCard=deck.current_deck.last().unwrap();
+             
+             RummyUtils::value_sort(&mut self.hand.current_hand);
+
+             println!("Top discard: {:?}", topCard);
+             println!("Top Draw: {:?}",deckCard);
+             println!("Current Hand: ");
+             for i in self.hand.current_hand.iter()
+             {
+                println!("{:?}",i);
+             }
+             println!("Enter 1 to take top discard, and 2 to draw card.");
+            let mut n = String::new();
+            io::stdin()
+               .read_line(&mut n)
+               .expect("failed to read input.");
+             n.trim().parse::<usize>().expect("invalid input")
+        };
+    
         if input == 1
         {
-            self.hand.card_to_hand(*topCard);
-             drew_card = 1;
+            self.hand.card_to_hand(deck.discard_deck.pop().unwrap());
+            
         }
         else 
         {
-            self.hand.card_to_hand(*deckCard);
-            drew_card = 2;
-        } 
-        return drew_card;
+            self.hand.card_to_hand(deck.current_deck.pop().unwrap());
+        }
     }
     // Function to get player to play cards
     pub fn discarding_card(&mut self, turnNum: &usize)-> (Card<PlayingCard>, bool,bool)
     {
         let discardedSomething = true;
-        let discard_card = self.hand.current_hand[0];
+        //let discard_card = self.hand.current_hand[0];
         let rummy = false;
         RummyUtils::value_sort(&mut self.hand.current_hand);
         println!("Current Hand, Enter a number to discard:");
@@ -172,8 +180,8 @@ impl UserP{
         let card_select = n.trim().parse::<usize>().expect("invalid input");
         println!("{:?}", card_select);
 
-        let discard_card = self.hand.current_hand[card_select];
-        self.hand.card_from_hand(card_select);
+         
+        let discard_card =self.hand.card_from_hand(card_select);
 
         RummyUtils::mark_safe(&mut self.hand.current_hand);
         let mut rummy = true;

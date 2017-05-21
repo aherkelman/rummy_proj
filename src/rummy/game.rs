@@ -7,8 +7,8 @@ use gencard::Deck;
 use rummy::tools::Hand;
 use sprite::*;
 use std::io;
-
-
+use rummy::draw;
+use gencard::Card;
 
 pub struct Game 
 {
@@ -21,23 +21,19 @@ pub struct Game
 }
 impl Game 
 {
-    pub fn new()->Game
+    pub fn new(sprite_manager:draw::CardSpriteManager)->Game
     {
-        let mut regular_cards:Vec<PlayingCard> = Vec::new();
+        let mut regular_cards:Vec<Card<PlayingCard>> = Vec::new();
+
 
         // Fill in values 1 - 13 (ace through king) for each suit
         for x in 0..4 
         {
             for y in 1..14
             {
-                match x {
-                    0 => regular_cards.push(PlayingCard{val:y, suit:Suit::Heart, numMatchs:0}),
-                    1 => regular_cards.push(PlayingCard{val:y, suit:Suit::Spade, numMatchs:0}),
-                    2 => regular_cards.push(PlayingCard{val:y, suit:Suit::Diamond, numMatchs:0}),
-                    3 => regular_cards.push(PlayingCard{val:y, suit:Suit::Club, numMatchs:0}),
-                    _ => println!("Error!"),
-
-                }
+                
+                let sp=sprite_manager.new_card(x,y);
+                regular_cards.push(Card::new(PlayingCard{val:y, suit:x, numMatchs:0,sprite:sp}))
             }
         }
 
@@ -81,14 +77,17 @@ impl Game
         // Game state 0 waits for player to pick which card to draw
         if self.game_state == 0
         {
-            let mut discard = self.deck.current_deck[0];
+            //let mut discard = self.deck.current_deck[0];
             let mut drew_card = true;
 
             // Get selected card
             // input xpos ypos, return if draw, discard, or neither selected
-            let card_drawn = self.player2.drawing_card(&self.deck.discard_deck[self.deck.discard_deck.len()-1],
-                                      &self.deck.current_deck[self.deck.current_deck.len()-1]);
+            //let card_drawn = self.player2.drawing_card(&self.deck.discard_deck[self.deck.discard_deck.len()-1],
+            //                          &self.deck.current_deck[self.deck.current_deck.len()-1]);
 
+            self.player2.drawing_card(&mut self.deck);
+            self.game_state=1;
+            /*
             if card_drawn != 0
             {
                 self.game_state=1;
@@ -97,7 +96,7 @@ impl Game
                     self.deck.draw_card();
                 }
                 // update sprite display
-            }
+            }*/
             //else nothing
             
         }
@@ -112,18 +111,13 @@ impl Game
                 self.deck.discard(discard);
                 self.rummy=x;
                 self.game_state=0;
-                let (discard,drew_card,x) = 
+                let (discard,x) = 
                         self.player1.play_turn(
-                                &self.deck.discard_deck[self.deck.discard_deck.len()-1],
-                                &self.deck.current_deck[self.deck.current_deck.len()-1],
+                                    &mut self.deck,
                                 &self.num_turns);
                 self.rummy=x;
                 self.num_turns += 1;
-                if drew_card
-                {
-                    println!("drawing card...");
-                    self.deck.draw_card();
-                }
+                
                 self.deck.discard(discard);
             }
 

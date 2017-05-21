@@ -12,6 +12,7 @@ use graphics::types::SourceRectangle;
 use std::rc::Rc;
 
 
+
 use piston_window::*;
 use sprite::*;
 use ai_behavior::{
@@ -27,14 +28,8 @@ mod gencard;
 mod rummy;
 
 fn main() {
-    /*
-    let mut game = rummy::game::Game::new();
-    let xpos = 1.2;
-    let ypos = 2.5;
-    while true{
-    game.play_game(xpos,ypos);
-    }
-    */
+
+    
     //rummy::game::play_game();
 
     let (width, height) = (1000, 600);
@@ -45,6 +40,14 @@ fn main() {
         .opengl(opengl)
         .build()
         .unwrap();
+
+
+    let mut game = rummy::game::Game::new(rummy::draw::CardSpriteManager::new(&mut window));
+    let xpos = 1.2;
+    let ypos = 2.5;
+    while true{
+        game.play_game(xpos,ypos);
+    }
 
     let mut draw_stuff=draw::Drawing::new(&mut window);
 
